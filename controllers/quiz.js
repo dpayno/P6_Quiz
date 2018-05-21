@@ -202,13 +202,17 @@ exports.randomplay = (req, res, next) => {
 
 exports.randomcheck = (req, res, next) => {
 
+
+    req.session.resolved = req.session.resolved || [];
+
     const answer = req.query.answer || '';
     const result = answer.toLowerCase().trim() === req.quiz.answer.toLowerCase().trim();
-    const score = req.session.resolved.length;
+    let score = req.session.resolved.length;
 
     if(result){
         if(req.session.resolved.indexOf(req.quiz.id) === -1){
             req.session.resolved.push(req.quiz.id);
+            score = req.session.resolved.length;
         }
 
         models.quiz.count()
@@ -222,7 +226,7 @@ exports.randomcheck = (req, res, next) => {
             }
         });
     }else{
-        const score = req.session.resolved.length;
+        let score = req.session.resolved.length;
         delete req.session.resolved;
         res.render('quizzes/random_result', {result, score, answer});
     }
